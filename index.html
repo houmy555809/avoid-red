@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Never touch red</title>
+		<style>
+			body{
+				height:100%;
+				width:100%;
+			}
+			canvas{
+				height:100%;
+				width:100%;
+			}
+		</style>
+		<script>
+			window.onload=function(){
+				var cv=document.getElementById("main");
+				var cxt=cv.getContext("2d");
+				var ball=new Image();
+				ball.src="img/ball.jfif";
+				var up2=new Image();
+				up2.src="img/up2.jfif";
+				var up3=new Image();
+				up3.src="img/up3.jfif";
+				var tileR=new Image();
+				tileR.src="img/tile-red.jfif";
+				var tileW=new Image();
+				tileW.src="img/tile-white.jfif";
+				var x=0.0,vy=0,y=0,grav=0.05,gaming=true,dead=false,has_up2=false,has_up3=false;
+				var lvl=[0,0,1,1,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0];
+				var pwu=[0,3,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0];
+				var claimed=[];
+				for(var i=0;i<lvl.length;i++){
+					claimed.push(false);
+				}
+				window.addEventListener("keydown",function(e){
+					if(e.keyCode==49){
+						if(Math.abs(vy-0)<0.1) vy=0.2;
+					}else if(e.keyCode==50&&has_up2){
+						if(Math.abs(vy-0)<0.1){
+							vy=0.3;
+							has_up2=false;
+						}
+					}else if(e.keyCode==51&&has_up3){
+						if(Math.abs(vy-0)<0.1){
+							vy=0.4;
+							has_up3=false;
+						}
+					}
+				});
+				setInterval(function(){
+					cxt.clearRect(0,0,cv.width,cv.height);
+					if(x>lvl.length){
+						gaming=false;
+					}
+					if(!gaming&&!dead){
+						cxt.fillText("You won!",cv.height*0.4,cv.width*0.25,cv.width*0.5);
+					}else if(dead){
+						cxt.fillText("Game over!",cv.height*0.4,cv.width*0.25,cv.width*0.5);
+					}else{
+						for(var i=0;i<lvl.length;i++){
+							if(lvl[i]==0){
+								cxt.drawImage(tileW,cv.width*0.75-20*i+20*x,cv.height*0.5+20,20,20);
+							}else{
+								cxt.drawImage(tileR,cv.width*0.75-20*i+20*x,cv.height*0.5+20,20,20);
+							}
+							if(Math.abs(x-i)<=0.1&&Math.abs(y-0)<=0.1){
+								if(lvl[i]==1){
+									dead=true;
+								}
+							}
+						}
+						for(var i=0;i<pwu.length;i++){
+							if(!claimed[i]){
+								if(pwu[i]==3){
+									cxt.drawImage(up3,cv.width*0.75-20*i+20*x,cv.height*0.5,20,20);
+								}else if(pwu[i]==2){
+									cxt.drawImage(up2,cv.width*0.75-20*i+20*x,cv.height*0.5,20,20);
+								}
+								if(Math.abs(x-i)<=0.1&&Math.abs(y-0)<=0.1){
+									claimed[i]=true;
+									if(pwu[i]==3){
+										has_up3=true;
+									}else if(pwu[i]==2){
+										has_up2=true;
+									}
+								}
+							}
+						}
+						cxt.drawImage(ball,cv.width*0.75,cv.height*0.5-y*100,20,20);
+						cxt.fillText("Press 1 to jump 1 cells",cv.width*0.75,cv.height*0.125,cv.width*0.25);
+						if(has_up2){
+							cxt.fillText("Press 2 to jump 2 cells",cv.width*0.75,cv.height*0.25,cv.width*0.25);
+						}else{
+							cxt.fillText("[DISABLED]Press 2 to jump 2 cells",cv.width*0.75,cv.height*0.25,cv.width*0.25);
+						}
+						if(has_up3){
+							cxt.fillText("Press 3 to jump 3 cells",cv.width*0.75,cv.height*0.375,cv.width*0.25);
+						}else{
+							cxt.fillText("[DISABLED]Press 3 to jump 3 cells",cv.width*0.75,cv.height*0.375,cv.width*0.25);
+						}
+						if(Math.abs(y-0)>=0.1){
+							vy-=grav;
+						}else if(vy<0){
+							vy=0;
+						}
+						console.log("y="+y+",vy="+vy);
+						y+=vy;
+						x+=0.2;
+					}
+				},100);
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="main"></canvas>
+	</body>
+</html>
