@@ -27,10 +27,13 @@
 				tileR.src="img/tile-red.jfif";
 				var tileW=new Image();
 				tileW.src="img/tile-white.jfif";
+				var ready=new Image();
+				ready.src="img/ready.jfif";
 				var x=0.0,vy=0,y=0,grav=0.0005,gaming=true,dead=false,has_up2=false,has_up3=false;
 				var lvl=[0,0,1,1,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0];
 				var pwu=[0,3,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0];
 				var claimed=[];
+				var started=false;
 				for(var i=0;i<lvl.length;i++){
 					claimed.push(false);
 				}
@@ -47,13 +50,17 @@
 							vy=0.04;
 							has_up3=false;
 						}
+					}else if(e.keyCode==32&&!started){
+						started=true;
 					}
 				});
 				setInterval(function(){
 					cxt.clearRect(0,0,cv.width,cv.height);
-					if(!gaming&&!dead){
+					if(!started){
+						cxt.drawImage(ready,0,0,cv.width,cv.height);
+					}else if(!gaming&&!dead){
 						cxt.fillText("You won!",cv.height*0.4,cv.width*0.25,cv.width*0.5);
-					}else if(dead){
+					}else if(!gaming&&dead){
 						cxt.fillText("Game over!",cv.height*0.4,cv.width*0.25,cv.width*0.5);
 					}else{
 						for(var i=0;i<lvl.length;i++){
@@ -97,15 +104,15 @@
 						}else{
 							cxt.fillText("[DISABLED]Press 3 to jump 3 cells",cv.width*0.75,cv.height*0.375,cv.width*0.25);
 						}
-						if(Math.abs(y-0)>=0.01||x>=lvl.length){
+						if(Math.abs(y-0)>=0.01||x>=lvl.length||dead){
 							vy-=grav;
 						}else if(vy<0){
 							vy=0;
 						}
-						if(x>=lvl.length&&y<=-cv.height/200)gaming=false;
+						if((x>=lvl.length||dead)&&y<=-cv.height/200)gaming=false;
 						console.log("y="+y+",vy="+vy);
 						y+=vy;
-						if(x<lvl.length)x+=0.02;
+						if(x<lvl.length&&!dead)x+=0.02;
 					}
 				},10);
 			}
